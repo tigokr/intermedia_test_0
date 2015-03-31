@@ -1,51 +1,64 @@
 <?php
+use yii\helpers\Html;
+use yii\helpers\Url;
+use yii\helpers\ArrayHelper;
+use kartik\widgets\Select2;
+use kartik\widgets\DepDrop;
+use kartik\widgets\ActiveForm;
 /* @var $this yii\web\View */
-$this->title = 'My Yii Application';
+$this->title = \Yii::$app->name;
+
 ?>
 <div class="site-index">
-
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+    <div class="page-header">
+        <h1>Хотите отправить письмо?</h1>
     </div>
 
-    <div class="body-content">
+    <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+    <?= $form->field($model, 'email')->textInput() ?>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+    <?= $form->field($model, 'region')->widget(Select2::className(), [
+        'data'=>ArrayHelper::map(\app\models\Region::find()->all(), 'id', 'title'),
+        'options'=>['id'=>'region_id', 'placeholder'=>'Выберите регион...']
+    ]); ?>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+    <?= $form->field($model, 'city')->widget(DepDrop::classname(), [
+        'data'=>[''=>''],
+        'options'=>['id'=>'city_id'],
+        'type' => DepDrop::TYPE_SELECT2,
+        'pluginOptions'=>[
+            'depends'=>['region_id'],
+            'placeholder'=>'Выберите город или населённый пункт...',
+            'url'=>Url::to(['/site/cities']),
+            'initialize' => true
+        ]
+    ]); ?>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+    <?= $form->field($model, 'city')->widget(Select2::className(), [
+        'data'=>ArrayHelper::map(\app\models\City::find()->all(), 'id', 'title'),
+        'options'=>['placeholder'=>'Ваш город...']
+    ]) ?>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+    <?= $form->field($model, 'phone')->widget(\yii\widgets\MaskedInput::className(), [
+        'mask'=>'(999) 999-9999',
+    ]) ?>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
-        </div>
+    <?= $form->field($model, 'text')->textarea(['rows'=>5]); ?>
 
+    <?= $form->field($model, 'file')->fileInput(['accept'=>'image/*;capture=camera']) ?>
+
+    <?= $form->field($model, 'verifyCode')->widget(yii\captcha\Captcha::className(), [
+        'template' => '<div class="row"><div class="col-lg-3">{image}</div><div class="col-lg-6">{input}</div></div>',
+    ])->label(\Yii::t('app', 'verifyCode')) ?>
+
+    <hr />
+
+    <div class="form-group text-right">
+        <?= Html::submitButton(\Yii::t('app', 'Send'), ['class' => 'btn btn-success']) ?>
     </div>
+
+    <?php ActiveForm::end(); ?>
 </div>

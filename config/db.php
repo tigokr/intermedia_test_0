@@ -1,9 +1,8 @@
 <?php
 
+Yii::setAlias('@db', dirname(__DIR__) . '/db');
+
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '',
-    'charset' => 'utf8',
+    'dsn' => 'sqlite:'.Yii::getAlias('@db/db.sqlite'),
 ];

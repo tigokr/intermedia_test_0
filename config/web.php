@@ -1,15 +1,19 @@
 <?php
 
 $params = require(__DIR__ . '/params.php');
+Yii::setAlias('@messages', dirname(__DIR__) . '/messages');
 
 $config = [
     'id' => 'basic',
+    'name'=>'Test Intermedia',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'language' => 'ru',
+    'timeZone'=>'Europe/Moscow',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => '',
+            'cookieValidationKey' => 'asdopaidokqw;lekasd',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -38,6 +42,30 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'enableStrictParsing' => false,
+            'rules' => [
+                '/' => 'site/index',
+            ]
+        ],
+        'formatter' => [
+            'currencyCode' => 'RUB',
+        ],
+        'i18n' => [ // попытка частично интернационализировать приложение =)
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@messages',
+                    'sourceLanguage' => 'en',
+                    'fileMap' => [
+                        'app' => 'app.php',
+                        'app/error' => 'error.php',
+                    ],
+                ],
+            ],
+        ],
     ],
     'params' => $params,
 ];

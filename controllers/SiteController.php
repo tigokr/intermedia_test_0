@@ -3,37 +3,13 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use app\models\LoginForm;
 use app\models\ContactForm;
+use yii\web\UploadedFile;
 
 class SiteController extends Controller
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
-    }
-
     public function actions()
     {
         return [
@@ -42,55 +18,44 @@ class SiteController extends Controller
             ],
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+                'fixedVerifyCode' => 'testme',
             ],
         ];
     }
 
     public function actionIndex()
     {
-        return $this->render('index');
-    }
+        $form = new ContactForm();
 
-    public function actionLogin()
-    {
-        if (!\Yii::$app->user->isGuest) {
-            return $this->goHome();
+        if($form->load(\Yii::$app->request->post('ContactForm'))){
+            $form->file = UploadedFile::getInstance($form, 'file');
+
+
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
+        return $this->render('index', [
+            'model'=>$form
+        ]);
     }
 
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
-    }
-
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        } else {
-            return $this->render('contact', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    public function actionAbout()
+    public function actionStatus()
     {
         return $this->render('about');
+    }
+
+    public function actionCities() {
+        $parents = \Yii::$app->request->post('depdrop_parents', null);
+        if (!empty($parents) && isset($parents[0]) && !empty($parents[0])) {
+            $region_id = $parents[0];
+            $tmp = \app\models\Region::findOne($region_id)->cities;
+            $out = [];
+            foreach ($tmp as $model) {
+                $out[] = ['id'=>$model->id, 'name'=>$model->title];
+            }
+
+            echo Json::encode(['output'=>$out, 'selected'=>'']);
+            return;
+        }
+        echo Json::encode(['output'=>'', 'selected'=>'']);
     }
 }

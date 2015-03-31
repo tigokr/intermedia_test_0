@@ -11,9 +11,12 @@ use yii\base\Model;
 class ContactForm extends Model
 {
     public $name;
+    public $phone;
+    public $city;
+    public $region;
     public $email;
-    public $subject;
-    public $body;
+    public $text;
+    public $file;
     public $verifyCode;
 
     /**
@@ -22,11 +25,10 @@ class ContactForm extends Model
     public function rules()
     {
         return [
-            // name, email, subject and body are required
-            [['name', 'email', 'subject', 'body'], 'required'],
-            // email has to be a valid email address
+            [['email', 'verifyCode'], 'required'],
             ['email', 'email'],
-            // verifyCode needs to be entered correctly
+            ['phone', 'match', 'pattern' => '/^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/'],
+
             ['verifyCode', 'captcha'],
         ];
     }
@@ -37,7 +39,16 @@ class ContactForm extends Model
     public function attributeLabels()
     {
         return [
-            'verifyCode' => 'Verification Code',
+            'verifyCode' => \Yii::t('app', 'Verification Code'),
+            'name' => \Yii::t('app', 'Name'),
+            'phone' => \Yii::t('app', 'Phone'),
+            'text' => \Yii::t('app', 'text'),
+            'city' => \Yii::t('app', 'City'),
+            'region' => \Yii::t('app', 'Region'),
+            'file' => \Yii::t('app', 'Enclosure'),
+            'email' => \Yii::t('app', 'Email'),
+            'text' => \Yii::t('app', 'Text'),
+
         ];
     }
 
