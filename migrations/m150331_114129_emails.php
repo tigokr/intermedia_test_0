@@ -14,7 +14,7 @@ class m150331_114129_emails extends Migration
         }
 
         $this->createTable('{{%emails}}', [
-            'id'=>Schema::TYPE_PK,
+            'id'=>Schema::TYPE_TEXT .' (13) UNIQUE PRIMARY KEY',
             'created'=>Schema::TYPE_DATETIME . ' NOT NULL',
             'data'=>Schema::TYPE_TEXT . ' NOT NULL',
             'received'=>Schema::TYPE_BOOLEAN . ' NOT NULL',

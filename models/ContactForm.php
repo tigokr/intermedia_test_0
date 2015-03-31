@@ -4,6 +4,8 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\Json;
+use yii\helpers\VarDumper;
 
 /**
  * ContactForm is the model behind the contact form.
@@ -64,15 +66,34 @@ class ContactForm extends Model
      * @param  string  $email the target email address
      * @return boolean whether the model passes validation
      */
-    public function contact($email)
+    public function contact($adr, $subject = 'Умольчальная тема')
     {
         if ($this->validate()) {
-            Yii::$app->mailer->compose()
-                ->setTo($email)
-                ->setFrom([$this->email => $this->name])
-                ->setSubject($this->subject)
-                ->setTextBody($this->body)
-                ->send();
+            $file = null;
+            if($this->file) {
+                $path_parts = pathinfo($this->file->name);
+                $file = \app\helpers\String::sanitize($path_parts['filename']).'.'.\app\helpers\String::sanitize($path_parts['extension']);
+            }
+            $email = new \app\models\Email();
+            $email->genId();
+
+            $email_object = Yii::$app->mailer->compose();
+            $email_object->setTo([$adr=>'admin', $this->email=>$this->name])
+            ->setFrom([\Yii::$app->params['noreplyEmail'] => \Yii::$app->params['noreplyEmailName']])
+            ->setSubject($subject)
+            ->setHtmlBody(
+                '<div>'.\yii\helpers\HtmlPurifier::process($this->text).'</div>'
+                .'<img src="'.\Yii::$app->params['host'].'site/readed?id='.$email->id.'" />'
+            );
+            if($file)
+                $email_object->attach($this->file->tempName, ['fileName'=>$file, 'contentType'=>$this->file->type]);
+
+            $email_object->send(); // or may user beautiful template
+
+            $email->emailMessage = $this;
+            $email->created = time();
+            $email->received = 0;
+            $email->save();
 
             return true;
         } else {

@@ -14,6 +14,13 @@ $this->title = \Yii::$app->name;
         <h1>Хотите отправить письмо?</h1>
     </div>
 
+    <?php
+    if($flash = \Yii::$app->session->getFlash('success'))
+        echo \kartik\widgets\Alert::widget([
+            'options' => [ 'class' => 'alert-info' ], 'body' => $flash,
+        ]);
+    ?>
+
     <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <?= $form->field($model, 'recipient')->textInput() ?>

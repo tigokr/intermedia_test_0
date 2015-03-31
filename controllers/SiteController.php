@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\Email;
+use app\models\EmailSearch;
 use Yii;
 use yii\helpers\Json;
 use yii\helpers\VarDumper;
@@ -37,9 +39,9 @@ class SiteController extends Controller
         if($form->load(\Yii::$app->request->post())){
             $form->file = UploadedFile::getInstance($form, 'file');
 
-            if($form->validate()) {
-                VarDumper::dump($form, 2, 1);
-                die;
+            if($form->validate() && $form->contact($form->recipient)) {
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'Email successfully sended!'));
+                $this->redirect(['site/index']);
             }
         }
 
@@ -48,9 +50,25 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionReaded($id){
+        $email = Email::findOne(['id'=>$id]);
+        if(!empty($email)) {
+            $email->received = 1;
+            $email->update();
+        }
+        header('Content-Type: image/jpeg');
+        echo file_get_contents(\Yii::getAlias('@webroot').'/1.gif');
+    }
+
     public function actionStatus()
     {
-        return $this->render('about');
+        $searchModel = new EmailSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('status', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     public function actionCities() {
