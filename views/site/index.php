@@ -16,6 +16,10 @@ $this->title = \Yii::$app->name;
 
     <?php $form = ActiveForm::begin(['enableAjaxValidation' => true, 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
+    <?= $form->field($model, 'recipient')->textInput() ?>
+
+    <hr />
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'email')->textInput() ?>
@@ -37,10 +41,10 @@ $this->title = \Yii::$app->name;
         ]
     ]); ?>
 
-    <?= $form->field($model, 'city')->widget(Select2::className(), [
+    <?php /* =$form->field($model, 'city')->widget(Select2::className(), [
         'data'=>ArrayHelper::map(\app\models\City::find()->all(), 'id', 'title'),
         'options'=>['placeholder'=>'Ваш город...']
-    ]) ?>
+    ]) */ ?>
 
     <?= $form->field($model, 'phone')->widget(\yii\widgets\MaskedInput::className(), [
         'mask'=>'(999) 999-9999',

@@ -40,6 +40,8 @@ class m150330_112855_regions extends Migration
             $this->insert('{{%cities}}', $city);
         }
 
+        return true;
+
     }
 
     public function down()
@@ -50,7 +52,7 @@ class m150330_112855_regions extends Migration
 
         echo "m150330_112855_regions reverted.\n";
 
-        return false;
+        return true;
     }
 
 

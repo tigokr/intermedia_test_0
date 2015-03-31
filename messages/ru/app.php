@@ -6,6 +6,7 @@ return [
     'Name' => 'Имя',
     'Enclosure' => 'Приложение',
     'Email' => 'email',
+    'Recipient' => 'Получатель',
     'City' => 'Город',
     'Region' => 'Регион',
     'Phone' => 'Телефон',

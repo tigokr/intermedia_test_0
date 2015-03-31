@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\helpers\Json;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use app\models\ContactForm;
 use yii\web\UploadedFile;
@@ -27,10 +28,19 @@ class SiteController extends Controller
     {
         $form = new ContactForm();
 
-        if($form->load(\Yii::$app->request->post('ContactForm'))){
+        if (Yii::$app->request->isAjax && $form->load(\Yii::$app->request->post()))
+        {
+            Yii::$app->response->format = 'json';
+            return \yii\widgets\ActiveForm::validate($form);
+        }
+
+        if($form->load(\Yii::$app->request->post())){
             $form->file = UploadedFile::getInstance($form, 'file');
 
-
+            if($form->validate()) {
+                VarDumper::dump($form, 2, 1);
+                die;
+            }
         }
 
         return $this->render('index', [
